@@ -277,16 +277,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final error = jsonDecode(wcResponse.body);
         final errorMessage = error['message']?.toString() ?? 'Konto już istnieje';
         
-        // If account already exists, create user for demo
+        // If account already exists, allow user to login instead
         if (errorMessage.toLowerCase().contains('exists') || 
-            errorMessage.toLowerCase().contains('already')) {
-          final user = User(
-            id: DateTime.now().millisecondsSinceEpoch,
-            email: event.email,
-            firstName: event.firstName,
-            lastName: event.lastName,
-          );
-          emit(Authenticated(user));
+            errorMessage.toLowerCase().contains('already') ||
+            errorMessage.toLowerCase().contains('username')) {
+          emit(AuthError('Konto już istnieje. Proszę się zalogować lub użyć innego adresu email.'));
           return;
         }
         

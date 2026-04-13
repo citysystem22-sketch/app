@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../data/models/product_model.dart';
 import '../../presentation/bloc/product_bloc.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
+
+/// Strip HTML tags from string
+String stripHtml(String htmlString) {
+  return htmlString.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+}
 
 class ProductDetailsPage extends StatefulWidget {
   final int productId;
@@ -145,7 +149,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           slivers: [
             // App Bar with image
             SliverAppBar(
-              expandedHeight: 350,
+              expandedHeight: 300,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
@@ -159,7 +163,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         itemBuilder: (context, index) {
                           return CachedNetworkImage(
                             imageUrl: product.images[index].src,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             placeholder: (context, url) => Container(
                               color: Colors.grey[200],
                               child: const Center(
@@ -347,18 +351,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
-                      Html(
-                        data: product.description!,
-                        style: {
-                          "body": Style(
-                            margin: Margins.zero,
-                            padding: HtmlPaddings.zero,
-                            fontSize: FontSize(14),
-                          ),
-                          "p": Style(
-                            margin: Margins.only(bottom: 8),
-                          ),
-                        },
+                      Text(
+                        stripHtml(product.description!),
+                        style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(height: 24),
                     ],
