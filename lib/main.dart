@@ -54,6 +54,7 @@ class _MegaOutletAppState extends State<MegaOutletApp> {
   GoRouter _createRouter() {
     return GoRouter(
       initialLocation: '/',
+      debugLogDiagnostics: true,
       routes: [
         ShellRoute(
           builder: (context, state, child) {
@@ -106,6 +107,23 @@ class _MegaOutletAppState extends State<MegaOutletApp> {
           builder: (context, state) => const CheckoutPage(),
         ),
       ],
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Strona nie znaleziona: ${state.uri}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.go('/'),
+                child: const Text('Wróć do strony głównej'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
