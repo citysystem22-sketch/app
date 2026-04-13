@@ -37,15 +37,28 @@ class CartItem extends Equatable {
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
+    // Safely handle variations list
+    List<CartItemVariation>? parsedVariations;
+    if (json['variations'] is List<dynamic>) {
+      parsedVariations = (json['variations'] as List<dynamic>)
+          .whereType<Map<String, dynamic>>()
+          .map((e) => CartItemVariation.fromJson(e))
+          .toList();
+    }
+    
+    // Safely handle image
+    String? imageSrc;
+    if (json['image'] is Map<String, dynamic>) {
+      imageSrc = json['image']['src'] as String?;
+    }
+    
     return CartItem(
-      key: json['key'] as String,
+      key: json['key'] as String? ?? '',
       productId: json['id'] as int? ?? 0,
       quantity: json['quantity'] as int? ?? 1,
       name: json['name'] as String? ?? '',
       shortDescription: json['short_description'] as String?,
-      image: json['image'] != null
-          ? (json['image']['src'] as String?)
-          : null,
+      image: imageSrc,
       price: json['price'] as String?,
       regularPrice: json['regular_price'] as String?,
       salePrice: json['sale_price'] as String?,
@@ -54,12 +67,7 @@ class CartItem extends Equatable {
       isInStock: json['is_in_stock'] as bool? ?? false,
       isOnBackorder: json['is_on_backorder'] as bool? ?? false,
       sku: json['sku'] as String?,
-      variations: json['variations'] != null
-          ? (json['variations'] as List<dynamic>)
-              .map((e) =>
-                  CartItemVariation.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      variations: parsedVariations,
     );
   }
 
@@ -177,33 +185,30 @@ class Cart extends Equatable {
   });
 
   factory Cart.fromJson(Map<String, dynamic> json) {
+    // Helper to safely parse lists
+    List<T> _parseListSafe<T>(dynamic list, T Function(Map<String, dynamic>) mapper) {
+      if (list is List<dynamic>) {
+        return list.whereType<Map<String, dynamic>>().map((e) => mapper(e)).toList();
+      }
+      return [];
+    }
+    
+    // Helper to safely parse objects
+    T? _parseObjectSafe<T>(dynamic obj, T Function(Map<String, dynamic>) mapper) {
+      if (obj is Map<String, dynamic>) {
+        return mapper(obj);
+      }
+      return null;
+    }
+    
     return Cart(
-      items: (json['items'] as List<dynamic>?)
-              ?.map((e) => CartItem.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      totals: CartTotals.fromJson(json['totals'] as Map<String, dynamic>? ?? {}),
-      coupons: (json['coupons'] as List<dynamic>?)
-              ?.map((e) => CartCoupon.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      shippingOptions: (json['shipping_rates'] as List<dynamic>?)
-              ?.map((e) =>
-                  CartShippingOption.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      paymentMethods: (json['payment_methods'] as List<dynamic>?)
-              ?.map((e) => PaymentMethod.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      shippingAddress: json['shipping_address'] != null
-          ? CartShippingAddress.fromJson(
-              json['shipping_address'] as Map<String, dynamic>)
-          : null,
-      billingAddress: json['billing_address'] != null
-          ? CartBillingAddress.fromJson(
-              json['billing_address'] as Map<String, dynamic>)
-          : null,
+      items: _parseListSafe(json['items'], (e) => CartItem.fromJson(e)),
+      totals: CartTotals.fromJson(json['totals'] is Map<String, dynamic> ? json['totals'] : {}),
+      coupons: _parseListSafe(json['coupons'], (e) => CartCoupon.fromJson(e)),
+      shippingOptions: _parseListSafe(json['shipping_rates'], (e) => CartShippingOption.fromJson(e)),
+      paymentMethods: _parseListSafe(json['payment_methods'], (e) => PaymentMethod.fromJson(e)),
+      shippingAddress: _parseObjectSafe(json['shipping_address'], (e) => CartShippingAddress.fromJson(e)),
+      billingAddress: _parseObjectSafe(json['billing_address'], (e) => CartBillingAddress.fromJson(e)),
       selectedShippingMethodId: json['selected_shipping_method'] as String?,
       selectedPaymentMethodId: json['selected_payment_method'] as String?,
       needsPayment: json['needs_payment'] as bool? ?? true,

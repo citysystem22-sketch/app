@@ -53,48 +53,63 @@ class Product extends Equatable {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+    // Safely parse prices - handle null or wrong type
+    ProductPrices parsedPrices;
+    if (json['prices'] is Map<String, dynamic>) {
+      parsedPrices = ProductPrices.fromJson(json['prices'] as Map<String, dynamic>);
+    } else {
+      // Fallback prices from individual price fields
+      parsedPrices = ProductPrices(
+        price: json['price'] as String?,
+        regularPrice: json['regular_price'] as String?,
+        salePrice: json['sale_price'] as String?,
+        currencyCode: 'PLN',
+        currencySymbol: 'zł',
+        currencyMinorUnit: 2,
+      );
+    }
+    
     return Product(
       id: json['id'] as int,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
+      name: json['name'] as String? ?? '',
+      slug: json['slug'] as String? ?? '',
       permalink: json['permalink'] as String?,
       sku: json['sku'] as String?,
       shortDescription: json['short_description'] as String?,
       description: json['description'] as String?,
       onSale: json['on_sale'] as bool? ?? false,
-      prices: ProductPrices.fromJson(json['prices'] as Map<String, dynamic>),
+      prices: parsedPrices,
       averageRating: json['average_rating'] as String?,
       reviewCount: json['review_count'] as int? ?? 0,
-      images: (json['images'] as List<dynamic>?)
-              ?.map((e) => ProductImage.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      categories: (json['categories'] as List<dynamic>?)
-              ?.map((e) => ProductCategory.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      tags: (json['tags'] as List<dynamic>?)
-              ?.map((e) => ProductTag.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      attributes: (json['attributes'] as List<dynamic>?)
-              ?.map((e) => ProductAttribute.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      images: _parseListSafe(json['images'], (e) => ProductImage.fromJson(e as Map<String, dynamic>)),
+      categories: _parseListSafe(json['categories'], (e) => ProductCategory.fromJson(e as Map<String, dynamic>)),
+      tags: _parseListSafe(json['tags'], (e) => ProductTag.fromJson(e as Map<String, dynamic>)),
+      attributes: _parseListSafe(json['attributes'], (e) => ProductAttribute.fromJson(e as Map<String, dynamic>)),
       variations: json['variations'] as List<dynamic>? ?? [],
       hasOptions: json['has_options'] as bool? ?? false,
       isPurchasable: json['is_purchasable'] as bool? ?? false,
       isInStock: json['is_in_stock'] as bool? ?? false,
       isOnBackorder: json['is_on_backorder'] as bool? ?? false,
       lowStockRemaining: json['low_stock_remaining'] as int?,
-      stockAvailability: json['stock_availability'] != null
-          ? StockAvailability.fromJson(
-              json['stock_availability'] as Map<String, dynamic>)
-          : null,
-      addToCart: json['add_to_cart'] != null
-          ? AddToCart.fromJson(json['add_to_cart'] as Map<String, dynamic>)
-          : null,
+      stockAvailability: _parseObjectSafe(json['stock_availability'], (e) => StockAvailability.fromJson(e as Map<String, dynamic>)),
+      addToCart: _parseObjectSafe(json['add_to_cart'], (e) => AddToCart.fromJson(e as Map<String, dynamic>)),
     );
+  }
+
+  // Helper to safely parse lists
+  static List<T> _parseListSafe<T>(dynamic list, T Function(dynamic) mapper) {
+    if (list is List<dynamic>) {
+      return list.whereType<Map<String, dynamic>>().map((e) => mapper(e)).toList();
+    }
+    return [];
+  }
+
+  // Helper to safely parse objects
+  static T? _parseObjectSafe<T>(dynamic obj, T Function(dynamic) mapper) {
+    if (obj is Map<String, dynamic>) {
+      return mapper(obj);
+    }
+    return null;
   }
 
   String get formattedPrice {
