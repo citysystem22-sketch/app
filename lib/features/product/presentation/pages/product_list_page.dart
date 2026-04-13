@@ -6,8 +6,9 @@ import '../../../home/presentation/widgets/product_grid.dart';
 
 class ProductListPage extends StatefulWidget {
   final bool isSearch;
+  final int? categoryId;
 
-  const ProductListPage({super.key, this.isSearch = false});
+  const ProductListPage({super.key, this.isSearch = false, this.categoryId});
 
   @override
   State<ProductListPage> createState() => _ProductListPageState();
@@ -22,6 +23,9 @@ class _ProductListPageState extends State<ProductListPage> {
     super.initState();
     if (widget.isSearch) {
       // Don't load products until search is triggered
+    } else if (widget.categoryId != null) {
+      // Load products by category
+      context.read<ProductBloc>().add(LoadProductsByCategory(widget.categoryId!));
     } else {
       context.read<ProductBloc>().add(const LoadProducts());
     }

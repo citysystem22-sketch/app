@@ -45,6 +45,15 @@ class LoadProductDetails extends ProductEvent {
 
 class LoadCategories extends ProductEvent {}
 
+class LoadProductsByCategory extends ProductEvent {
+  final int categoryId;
+
+  const LoadProductsByCategory(this.categoryId);
+
+  @override
+  List<Object?> get props => [categoryId];
+}
+
 class SearchProducts extends ProductEvent {
   final String query;
 
@@ -149,6 +158,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<LoadMoreProducts>(_onLoadMoreProducts);
     on<LoadProductDetails>(_onLoadProductDetails);
     on<LoadCategories>(_onLoadCategories);
+    on<LoadProductsByCategory>(_onLoadProductsByCategory);
     on<SearchProducts>(_onSearchProducts);
   }
 
@@ -236,6 +246,26 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     } catch (e) {
       // Silently fail for categories
+    }
+  }
+
+  Future<void> _onLoadProductsByCategory(
+      LoadProductsByCategory event, Emitter<ProductState> emit) async {
+    emit(ProductLoading());
+    try {
+      final products = await _productDataSource.getProducts(
+        category: event.categoryId.toString(),
+      );
+
+      emit(ProductsLoaded(
+        products: products,
+        categories: _cachedCategories,
+        currentPage: 1,
+        hasReachedMax: true,
+        currentCategory: event.categoryId.toString(),
+      ));
+    } catch (e) {
+      emit(ProductError(e.toString()));
     }
   }
 

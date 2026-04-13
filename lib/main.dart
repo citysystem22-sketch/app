@@ -66,7 +66,11 @@ class _MegaOutletAppState extends State<MegaOutletApp> {
             ),
             GoRoute(
               path: '/products',
-              builder: (context, state) => const ProductListPage(),
+              builder: (context, state) {
+                final categoryIdStr = state.uri.queryParameters['category'];
+                final categoryId = categoryIdStr != null ? int.tryParse(categoryIdStr) : null;
+                return ProductListPage(categoryId: categoryId);
+              },
             ),
             GoRoute(
               path: '/products/:id',
