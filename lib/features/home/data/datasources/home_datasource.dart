@@ -185,9 +185,9 @@ class HomeDataSource {
       categories: [
         CategoryItem(
           id: 1,
-          name: 'Car audio - outlet',
-          imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2026/01/SLC8S-11.jpg',
-          link: '/kategoria-produktu/sklep-outlet/elektronika-outlet/car-audio-outlet/',
+          name: 'Elektronika - Outlet',
+          imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2025/01/smartwatch-amazfit-gts-4-mini-pink1.jpg',
+          link: '/kategoria-produktu/sklep-outlet/elektronika-outlet/',
         ),
         CategoryItem(
           id: 2,
@@ -197,15 +197,27 @@ class HomeDataSource {
         ),
         CategoryItem(
           id: 3,
-          name: 'Elektronika - Outlet',
-          imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2025/01/smartwatch-amazfit-gts-4-mini-pink1.jpg',
-          link: '/kategoria-produktu/sklep-outlet/elektronika-outlet/',
-        ),
-        CategoryItem(
-          id: 4,
           name: 'Narzędzia - Outlet',
           imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2026/01/Wega-Product81.jpg',
           link: '/kategoria-produktu/sklep-outlet/dom-i-ogrod/narzedzia-outlet/',
+        ),
+        CategoryItem(
+          id: 4,
+          name: 'Car audio - outlet',
+          imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2026/01/SLC8S-11.jpg',
+          link: '/kategoria-produktu/sklep-outlet/elektronika-outlet/car-audio-outlet/',
+        ),
+        CategoryItem(
+          id: 5,
+          name: 'Słuchawki - Outlet',
+          imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2025/01/sluchawki-nauszne-SONY-WH-XB900N-Czarny-bok1.jpg',
+          link: '/kategoria-produktu/sklep-outlet/elektronika-outlet/multimedia-outlet/sluchawki-outlet/',
+        ),
+        CategoryItem(
+          id: 6,
+          name: 'Zdrowie i uroda',
+          imageUrl: 'https://mega-outlet.pl/wp-content/uploads/2026/02/mega-outlet.png',
+          link: '/kategoria-produktu/sklep-outlet/zdrowie-i-uroda/',
         ),
       ],
     );
